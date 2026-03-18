@@ -12,5 +12,13 @@
   "type": "commonjs",
   "dependencies": {
     "express": "^5.2.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amspierre/fullstack.git"
+  },
+  "bugs": {
+    "url": "https://github.com/amspierre/fullstack/issues"
+  },
+  "homepage": "https://github.com/amspierre/fullstack#readme"
 }

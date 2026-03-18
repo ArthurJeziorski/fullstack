@@ -1,61 +1,70 @@
-let usuarios = [];
-let proximoId = 1;
+const pool = require("../database/db");
 
-function listarUsuarios() {
+async function listarUsuarios() {
 
-    return usuarios;
+    const resultado = await pool.query(
+        "SELECT * FROM usuarios ORDER BY id"
+    );
 
-}
-
-function buscarUsuarioPorId(id) {
-
-    return usuarios.find(u => u.id === id);
+    return resultado.rows;
 
 }
 
-function criarUsuario(nome, idade) {
+async function buscarUsuarioPorId(id) {
+
+    const resultado = await pool.query(
+        "SELECT * FROM usuarios WHERE id = $1",
+        [id]
+    );
+
+    return resultado.rows[0];
+
+}
+
+async function criarUsuario(nome, idade) {
 
     if (!nome || nome.trim() === "") {
         throw new Error("Nome é obrigatório");
     }
 
-    const novoUsuario = {
-        id: proximoId++,
-        nome,
-        idade
-    };
+    const resultado = await pool.query(
+        `
+        INSERT INTO usuarios (nome, idade)
+        VALUES ($1, $2)
+        RETURNING *
+        `,
+        [nome, idade]
+    );
 
-    usuarios.push(novoUsuario);
-
-    return novoUsuario;
-}
-
-function atualizarUsuario(id, nome, idade) {
-
-    const usuario = usuarios.find(u => u.id === id);
-
-    if (!usuario) {
-        return null;
-    }
-
-    usuario.nome = nome ?? usuario.nome;
-    usuario.idade = idade ?? usuario.idade;
-
-    return usuario;
+    return resultado.rows[0];
 
 }
 
-function deletarUsuario(id) {
+async function atualizarUsuario(id, nome, idade) {
 
-    const index = usuarios.findIndex(u => u.id === id);
+    const resultado = await pool.query(
+        `
+        UPDATE usuarios
+        SET nome = COALESCE($1, nome),
+            idade = COALESCE($2, idade)
+        WHERE id = $3
+        RETURNING *
+        `,
+        [nome, idade, id]
+    );
 
-    if (index === -1) {
-        return false;
-    }
+    return resultado.rows[0];
 
-    usuarios.splice(index, 1);
+}
 
-    return true;
+async function deletarUsuario(id) {
+
+    const resultado = await pool.query(
+        "DELETE FROM usuarios WHERE id = $1",
+        [id]
+    );
+
+    return resultado.rowCount > 0;
 
 }
 

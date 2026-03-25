@@ -8,14 +8,12 @@ const pool = new Pool({
     port: 5432
 });
 
-module.exports = pool;
-
 pool.query("SELECT NOW()", (err, res) => {
-
     if (err) {
         console.error("Erro ao conectar no banco", err);
     } else {
         console.log("Conectado ao PostgreSQL:", res.rows[0]);
     }
-
 });
+
+module.exports = pool;
